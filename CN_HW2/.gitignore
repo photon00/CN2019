@@ -1,0 +1,4 @@
+*.mpg
+pthread.cpp
+openCV.cpp
+tmp*
