@@ -132,7 +132,7 @@ int main(int argc , char *argv[])
         }
         else if (cmd == CMD_PLAY){
         	char *p = strchr(clt.filename, '.');
-        	if (strcmp(p, ".mpg") != 0){
+        	if (p == NULL || strcmp(p, ".mpg") != 0){
         		fprintf(stderr, "The \"%s\" is not a mpg file\n", clt.filename);
         		continue;
         	}
@@ -267,7 +267,7 @@ static int decode_command(char message[]){
 		e0 = str_end;
 	}
 
-	int ret = 0, cmd = -1;
+	int ret = 0, cmd = CMD_ERR;
 	const char *command[] = {"ls", "quit", "put", "get", "play"};
 	for (int i=0; i<5; ++i){
 		ret = strcmp(h0, command[i]);
@@ -290,7 +290,7 @@ static int decode_command(char message[]){
 			cmd = CMD_FMT;
 		}
 	}
-	else {
+	else if (cmd >= 0){
 		h1 = e0+1;
 		while (isspace(*h1)) ++h1;
 		if (*h1 != '\0') cmd = CMD_FMT;

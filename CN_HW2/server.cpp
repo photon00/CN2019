@@ -13,6 +13,8 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <pthread.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include "opencv2/opencv.hpp"
 
 #define ERR_EXIT(a) { perror(a); exit(1); }
@@ -102,12 +104,20 @@ int main(int argc, char** argv){
     int conn_fd;  // fd for a new connection with client
     pthread_t pid;
 
+    struct stat st;
 
     // Parse args.
     if (argc != 2) {
         fprintf(stderr, "usage: %s [port]\n", argv[0]);
         exit(1);
     }
+
+    if (stat("./server_dir", &st) == -1){
+        mkdir("./server_dir", 0700);
+        fprintf(stderr, "Create folder \"server_dir\"\n");
+    }
+    chdir("server_dir");
+    fprintf(stderr, "cd \"server_dir\"\n");
 
     // Initialize server
     init_server((unsigned short) atoi(argv[1]));
@@ -332,7 +342,7 @@ static int send_frame(request *reqP){
     		}
     		if (handle_write(reqP) < 0) return -1;
     	}
-    	if (handle_read(reqP) != 1) return -1;
+    	if (handle_read(reqP) != 1) return -1;  // receive ACK from client
     	if (reqP->buf[0] < 0) break;  // client press esc
 
     }
