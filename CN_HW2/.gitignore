@@ -2,3 +2,5 @@
 pthread.cpp
 openCV.cpp
 tmp*
+server
+client

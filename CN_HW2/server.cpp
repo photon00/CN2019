@@ -425,10 +425,10 @@ static void* thread_service(void* arg){
 		else {  // STATE_PLAY
 			requestP[conn_fd].cap = new VideoCapture();
 			if (requestP[conn_fd].cap->open(requestP[conn_fd].filename) == false){
-				requestP[conn_fd].buf[0] = 0xff;
-				requestP[conn_fd].buf[1] = 0xff;
-				requestP[conn_fd].buf[2] = 0xff;
-				requestP[conn_fd].buf[3] = 0xff;
+				requestP[conn_fd].buf[0] = -errno & 0xff;
+				requestP[conn_fd].buf[1] = (-errno >> 8) & 0xff;
+				requestP[conn_fd].buf[2] = (-errno >> 16) & 0xff;
+				requestP[conn_fd].buf[3] = (-errno >> 24) & 0xff;
 				requestP[conn_fd].buf_len = 4;
         		if (handle_write(&requestP[conn_fd]) < 0) { requestP[conn_fd].cap->release(); break; }
 				requestP[conn_fd].state = STATE_WTCMD;

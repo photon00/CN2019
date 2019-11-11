@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
+#include <signal.h>
 #include <errno.h>
 #include "opencv2/opencv.hpp"
 
@@ -59,13 +60,16 @@ using namespace std;
 using namespace cv;
 int main(int argc , char *argv[])
 {
+	signal(SIGPIPE, SIG_IGN);
 	int cmd, ret;
-	if (argc != 3){
-		fprintf(stderr, "usage: %s [server hostname] [port]", argv[0]);
+	if (argc != 2){
+		fprintf(stderr, "usage: %s [ip:port]\n", argv[0]);
 		exit(1);
 	}
-    
-	init_client(argv[1], (unsigned short) atoi(argv[2]));
+    char *p = strchr(argv[1], ':');
+    *p = '\0';
+
+	init_client(argv[1], (unsigned short) atoi(p+1));
 
     while (true){
         printf("> ");
@@ -82,7 +86,7 @@ int main(int argc , char *argv[])
         if (cmd == CMD_QUIT){ send_command(cmd); break; }
         if (cmd == CMD_LIST){
         	send_command(cmd);
-        	if (handle_read() != 1) break;
+        	if (handle_read() != 1) ERR_EXIT("socket read");
         	fprintf(stderr, "%s\n", clt.buf);
         }
         else if (cmd == CMD_PUT){
@@ -127,11 +131,16 @@ int main(int argc , char *argv[])
 			close(open_fd);
         }
         else if (cmd == CMD_PLAY){
+        	char *p = strchr(clt.filename, '.');
+        	if (strcmp(p, ".mpg") != 0){
+        		fprintf(stderr, "The \"%s\" is not a mpg file\n", clt.filename);
+        		continue;
+        	}
         	send_command(cmd);
 			if (handle_read() != 1) ERR_EXIT("socket read");
 			int height = *(int*)clt.buf;
 			if (height < 0){
-				fprintf(stderr, "Can not play file \"%s\"\n", clt.filename);
+				fprintf(stderr, "Can not play file \"%s\": %s\n", clt.filename, strerror(-height));
 				continue;
 			}
 			int width = *(int*)(clt.buf+4);

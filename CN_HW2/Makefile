@@ -10,22 +10,11 @@ SER = server
 all: server client
   
 server: $(SERVER)
-	$(CC) $(SERVER) -o $(SER)  $(OPENCV) $(PTHREAD) -g
+	$(CC) $(SERVER) -o $(SER)  $(OPENCV) $(PTHREAD)
 client: $(CLIENT)
-	$(CC) $(CLIENT) -o $(CLI)  $(OPENCV) $(PTHREAD) -g
-	cp $(CLI) test_client/
-
-test: opencv pthread
-
-opencv: openCV.cpp
-	$(CC) openCV.cpp -o opencv $(OPENCV) -g
-pthread: pthread.cpp
-	$(CC) pthread.cpp -o pthread $(PTHREAD) -g
+	$(CC) $(CLIENT) -o $(CLI)  $(OPENCV) $(PTHREAD)
 
 .PHONY: clean
 
 clean:
 	rm $(CLI) $(SER)
-
-remove:
-	rm opencv pthread
