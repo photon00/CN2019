@@ -249,6 +249,7 @@ static void send_fin(){
 	while (1){
 		s_tmp.head.seqNumber = segment_idx;
 		s_tmp.head.length = 0;
+		s_tmp.head.ack = 0;
 		s_tmp.head.fin = 1;
 		sendto(socket_fd, &s_tmp, sizeof(segment), 0, (struct sockaddr *)&agent, sizeof(agent));
 		printf("send    fin\n"); fflush(stdout);

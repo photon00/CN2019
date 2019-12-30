@@ -186,7 +186,6 @@ static int read_socket(int length){
 				printf("recv    fin\n"); 
 				printf("send    finack\n");
 				getfin = 1;
-				break;
 			}
 			else {
 				printf("recv    data    #%d\n", s_tmp.head.seqNumber);
@@ -200,6 +199,7 @@ static int read_socket(int length){
 			s_tmp.head.length = 0;
 			s_tmp.head.ackNumber = s_tmp.head.seqNumber;
 			sendto(socket_fd, &s_tmp, sizeof(segment), 0, (struct sockaddr *)&agent, sizeof(agent));
+			if (getfin) break;
 		}
 	}
 	int return_length = segment_len;
